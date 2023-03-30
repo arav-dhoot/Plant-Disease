@@ -212,9 +212,9 @@ if __name__ == "__main__":
                          filename = model_filename,
                          every_n_epochs=1)
 
-    device = torch.device('mps')
+    device = torch.device('cuda')
     model = LitModel(NUM_CLASSES, MODEL, LEARNING_RATE, WEIGHT_DECAY, FINE_TUNE, MIXUP).to(device)
-    trainer = pl.Trainer(max_epochs=EPOCHS, accelerator="mps", callbacks=[early_stop_callback, mc])
+    trainer = pl.Trainer(max_epochs=EPOCHS, accelerator="cuda", callbacks=[early_stop_callback, mc])
     trainer.fit(model, train_loader, valid_loader)
 
     end = time.time()
