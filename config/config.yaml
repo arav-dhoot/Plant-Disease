@@ -1,0 +1,39 @@
+main_dir:
+  new_plants: '/Users/aravdhoot/Plant_Disease_Classification/data/New Plants Diseases Dataset'
+  plant_disease: '/Users/aravdhoot/Plant_Disease_Classification/data/Plant Disease Recognition'
+  plant_pathology: '/Users/aravdhoot/Plant_Disease_Classification/data/plant-pathology-2020-fgvc7'
+
+root_dir:
+  new_plants:
+    train: '/Users/aravdhoot/Plant_Disease_Classification/data/New Plants Diseases Dataset/New Plant Diseases Dataset(Augmented)/New Plant Diseases Dataset(Augmented)/train'
+    valid: '/Users/aravdhoot/Plant_Disease_Classification/data/New Plants Diseases Dataset/New Plant Diseases Dataset(Augmented)/New Plant Diseases Dataset(Augmented)/valid'
+  plant_disease:
+    train: '/Users/aravdhoot/Plant_Disease_Classification/data/Plant Disease Recognition/Train/Train'
+    valid: '/Users/aravdhoot/Plant_Disease_Classification/data/Plant Disease Recognition/Validation/Validation'
+    test: '/Users/aravdhoot/Plant_Disease_Classification/data/Plant Disease Recognition/Test/Test'
+  plant_pathology: '/Users/aravdhoot/Plant_Disease_Classification/data/plant-pathology-2020-fgvc7/Train'
+  
+csv:
+  new_plants: 
+    train: 'new_plants_disease_train.csv'
+    train_with_labels: 'new_plants_disease_train_with_labels.csv'
+    valid: 'new_plants_disease_valid.csv'
+    valid_with_labels: 'new_plants_disease_valid_with_labels.csv'
+    test: 'new_plants_disease_test.csv'
+    test_with_labels: 'new_plants_disease_test_with_labels.csv'
+  plant_disease:
+    train: 'plants_disease__recognition_train.csv'
+    train_with_labels: 'plants_disease__recognition_train_with_labels.csv'
+    valid: 'plants_disease__recognition_valid.csv'
+    valid_with_labels: 'plants_disease__recognition_valid_with_labels.csv'
+    test: 'plants_disease__recognition_test.csv'
+    test_with_labels: 'plants_disease__recognition_test_with_labels.csv'
+  plant_pathology: 
+    train: 'plant_pathology_train.csv'
+    valid: 'plant_pathology_valid.csv'
+    test: 'plant_pathology_test.csv'
+
+num_classes:
+  new_plants: 38
+  plant_disease: 3
+  plant_pathology: 4
