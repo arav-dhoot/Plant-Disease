@@ -1,6 +1,5 @@
 env/
-data/New Plants Diseases Dataset
- __pycache__/
+__pycache__/
 .vscode/
 .DS_Store
 src/lightning_logs
