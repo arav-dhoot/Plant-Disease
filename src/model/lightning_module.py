@@ -19,6 +19,7 @@ class LitModel(LightningModule):
         self.weight_decay = weight_decay
         self.learning_rate = learning_rate
         self.mixup_func = mixup_func
+        self.accuracy = torchmetrics.classification.MulticlassAccuracy(self.num_classes)
         self.model = model
         if model == 'ViT':
             self.feature_extractor = timm.create_model('vit_base_patch16_224_in21k', pretrained=True, num_classes=0)
@@ -51,9 +52,9 @@ class LitModel(LightningModule):
         y = torch.Tensor(y)
         loss = self.criterion(probabilities, y)
         if self.mixup_func is None:
-            accuracy = torchmetrics.functional.accuracy(probabilities, y)
+            acc = self.accuracy(probabilities, y)
             self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
-            self.log("accuracy", accuracy, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+            self.log("accuracy", acc, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         else:
             self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         return loss
@@ -65,8 +66,9 @@ class LitModel(LightningModule):
         probabilities = torch.softmax(logits, dim=1)
         y = torch.Tensor(y)
         loss = self.criterion(probabilities, y)
-        accuracy = torchmetrics.functional.accuracy(probabilities, y)
-        self.log("accuracy", accuracy, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        # accuracy = torchmetrics.functional.accuracy(probabilities, y, task='multiclass')
+        acc = self.accuracy(probabilities, y)
+        self.log("accuracy", acc, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         self.log("valid_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
@@ -77,8 +79,8 @@ class LitModel(LightningModule):
         probabilities = torch.softmax(logits, dim=1)
         y = torch.Tensor(y)
         loss = self.criterion(probabilities, y)
-        accuracy = torchmetrics.functional.accuracy(probabilities, y)
-        self.log("accuracy", accuracy, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        acc = self.accuracy(probabilities, y)
+        self.log("accuracy", acc, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         self.log("test_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         return loss
 

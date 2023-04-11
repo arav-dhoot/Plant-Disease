@@ -4,3 +4,5 @@ __pycache__/
 .DS_Store
 src/lightning_logs
 src/__pycache__
+src/model/__pycache__
+src/datasets/__pycache__
