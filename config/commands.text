@@ -1,1 +1,1 @@
-pip install pytorch-lightning timm
+pip install pytorch-lightning timm torchvision albumentations
