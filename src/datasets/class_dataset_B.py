@@ -10,7 +10,15 @@ import torch
 import random
 
 class PlantImageDatasetB(Dataset):
-    def __init__(self, csv_file, csv_with_labels, root_dir, main_dir, transform=None, albumentation_transform=None, imbalance=False):
+    def __init__(self, 
+                 csv_file, 
+                 csv_with_labels, 
+                 root_dir, 
+                 main_dir, 
+                 transform=None, 
+                 albumentation_transform=None, 
+                 imbalance=False):
+        
         self.root_dir = root_dir
         self.main_dir = main_dir
         self.csv_file = csv_file

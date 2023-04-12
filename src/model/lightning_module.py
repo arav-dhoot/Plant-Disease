@@ -13,7 +13,15 @@ from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 import numpy as np
 
 class LitModel(LightningModule):
-    def __init__(self, num_classes, model, learning_rate, weight_decay, dropout_rate=0.5, fine_tune=False, mixup_func=None):
+    def __init__(self, 
+                num_classes, 
+                model, 
+                learning_rate, 
+                weight_decay, 
+                dropout_rate=0.5, 
+                fine_tune=False, 
+                mixup_func=None):
+        
         super().__init__()
         self.num_classes = num_classes
         self.weight_decay = weight_decay
