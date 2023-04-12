@@ -69,4 +69,3 @@ class PlantImageDatasetC(Dataset):
         if(self.random_augment): image = self.random_augment(image)   
         label = self.annotations['Label'][index]
         return image, label
-        f
