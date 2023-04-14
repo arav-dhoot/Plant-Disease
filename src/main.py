@@ -14,6 +14,7 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 from timm.data import Mixup
 from timm.data.auto_augment import rand_augment_transform
+import imgaug.augmenters as iaa
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--dataset", 
@@ -70,14 +71,21 @@ train_transforms = T.Compose([T.Resize(size=SIZE), T.RandomRotation(45),T.Random
 
 resizing_transforms = T.Compose([T.Resize(size=SIZE)])
 baseline_transforms = A.Compose([ToTensorV2()])
-advanced_blur_transforms = A.Compose([A.Resize(HEIGHT, WIDTH, p=1, always_apply=True), A.augmentations.blur.transforms.AdvancedBlur(), ToTensorV2()])
-gauss_noise_transforms = A.Compose([A.Resize(HEIGHT, WIDTH, p=1, always_apply=True), A.augmentations.transforms.GaussNoise(), ToTensorV2()])
-down_scale_transforms = A.Compose([A.Resize(HEIGHT, WIDTH, p=1, always_apply=True), A.augmentations.transforms.Downscale(), ToTensorV2()])
-motion_blur_transforms = A.Compose([A.Resize(HEIGHT, WIDTH, p=1, always_apply=True), A.augmentations.blur.transforms.MotionBlur(), ToTensorV2()])
-random_fog_transforms = A.Compose([A.Resize(HEIGHT, WIDTH, p=1, always_apply=True), A.augmentations.transforms.RandomFog(), ToTensorV2()])
-random_rain_transforms = A.Compose([A.Resize(HEIGHT, WIDTH, p=1, always_apply=True), A.augmentations.transforms.RandomRain(), ToTensorV2()])
-random_shadow_transforms = A.Compose([A.Resize(HEIGHT, WIDTH, p=1, always_apply=True), A.augmentations.transforms.RandomShadow(), ToTensorV2()])
-random_sun_flare_transforms = A.Compose([A.Resize(HEIGHT, WIDTH, p=1, always_apply=True), A.augmentations.transforms.RandomSunFlare(), ToTensorV2()])
+# gauss_noise_transforms = A.Compose([A.Resize(HEIGHT, WIDTH, p=1, always_apply=True), A.GaussNoise(), ToTensorV2()])
+# down_scale_transforms = A.Compose([A.Resize(HEIGHT, WIDTH, p=1, always_apply=True), A.Downscale(), ToTensorV2()])
+# motion_blur_transforms = A.Compose([A.Resize(HEIGHT, WIDTH, p=1, always_apply=True), A.MotionBlur(), ToTensorV2()])
+# random_fog_transforms = A.Compose([A.Resize(HEIGHT, WIDTH, p=1, always_apply=True), A.RandomFog(), ToTensorV2()])
+# random_rain_transforms = A.Compose([A.Resize(HEIGHT, WIDTH, p=1, always_apply=True), A.RandomRain(), ToTensorV2()])
+# random_shadow_transforms = A.Compose([A.Resize(HEIGHT, WIDTH, p=1, always_apply=True), A.RandomShadow(), ToTensorV2()])
+# random_sun_flare_transforms = A.Compose([A.Resize(HEIGHT, WIDTH, p=1, always_apply=True), A.RandomSunFlare(), ToTensorV2()])
+
+gauss_blur_transforms = iaa.Sequential([iaa.GaussianBlur(sigma=(0.0, 3.0))])
+motion_blur_transforms = iaa.Sequential([iaa.MotionBlur(k=15)])
+affine_transformers = iaa.Sequential([iaa.Affine(scale=(0.5, 1.50))])
+rain_transforms = iaa.Sequential([iaa.Rain()])
+snowflakes_transforms = iaa.Sequential([iaa.Snowflakes(flake_size=(0.1, 0.4), speed=(0.01, 0.05))])
+fog_transforms = iaa.Sequential([iaa.Fog()])
+cloud_transforms = iaa.Sequential([iaa.Clouds()])
 
 with open('../config/config.yaml', 'r') as yaml_file:
     parse_yaml = yaml.safe_load(yaml_file)
@@ -107,7 +115,6 @@ if DATASET == "new_plants":
     test_dataset = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['valid'], main_dir=main_dir, transform=valid_transforms, imbalance=False)
 
     test_dataset_base_line = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['valid'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=baseline_transforms, imbalance=False)
-    test_dataset_advanced_blur = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['valid'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=advanced_blur_transforms, imbalance=False)
     test_dataset_gauss_noise = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['valid'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=gauss_noise_transforms, imbalance=False)
     test_dataset_down_scale = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['valid'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=down_scale_transforms, imbalance=False)
     test_dataset_motion_blur = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['valid'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=motion_blur_transforms, imbalance=False)
@@ -120,8 +127,7 @@ if DATASET == "new_plants":
     valid_loader = DataLoader(dataset=valid_dataset, batch_size=BATCH_SIZE, shuffle=False)
     test_loader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
-    test_loader_base_line = DataLoader(dataset=test_dataset_base_line, batch_size=BATCH_SIZE, shuffle=False) 
-    test_loader_advanced_blur = DataLoader(dataset=test_dataset_advanced_blur, batch_size=BATCH_SIZE, shuffle=False) 
+    test_loader_base_line = DataLoader(dataset=test_dataset_base_line, batch_size=BATCH_SIZE, shuffle=False)  
     test_loader_gauss_noise = DataLoader(dataset=test_dataset_gauss_noise, batch_size=BATCH_SIZE, shuffle=False)
     test_loader_down_scale = DataLoader(dataset=test_dataset_down_scale, batch_size=BATCH_SIZE, shuffle=False)
     test_loader_motion_blur = DataLoader(dataset=test_dataset_motion_blur, batch_size=BATCH_SIZE, shuffle=False)
@@ -139,7 +145,6 @@ elif DATASET == 'plant_disease':
     test_dataset = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['test'], main_dir=main_dir, transform=valid_transforms, imbalance=False)
 
     test_dataset_base_line = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['test'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=baseline_transforms, imbalance=False)
-    test_dataset_advanced_blur = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['test'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=advanced_blur_transforms, imbalance=False)
     test_dataset_gauss_noise = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['test'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=gauss_noise_transforms, imbalance=False)
     test_dataset_down_scale = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['test'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=down_scale_transforms, imbalance=False)
     test_dataset_motion_blur = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['test'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=motion_blur_transforms, imbalance=False)
@@ -152,8 +157,7 @@ elif DATASET == 'plant_disease':
     valid_loader = DataLoader(dataset=valid_dataset, batch_size=BATCH_SIZE, shuffle=False)
     test_loader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
-    test_loader_base_line = DataLoader(dataset=test_dataset_base_line, batch_size=BATCH_SIZE, shuffle=False)
-    test_loader_advanced_blur = DataLoader(dataset=test_dataset_advanced_blur, batch_size=BATCH_SIZE, shuffle=False) 
+    test_loader_base_line = DataLoader(dataset=test_dataset_base_line, batch_size=BATCH_SIZE, shuffle=False) 
     test_loader_gauss_noise = DataLoader(dataset=test_dataset_gauss_noise, batch_size=BATCH_SIZE, shuffle=False)
     test_loader_down_scale = DataLoader(dataset=test_dataset_down_scale, batch_size=BATCH_SIZE, shuffle=False)
     test_loader_motion_blur = DataLoader(dataset=test_dataset_motion_blur, batch_size=BATCH_SIZE, shuffle=False)
@@ -171,7 +175,6 @@ elif DATASET == 'plant_pathology':
     test_dataset = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=valid_transforms)
 
     test_dataset_base_line = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=baseline_transforms)
-    test_dataset_advanced_blur = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=advanced_blur_transforms)
     test_dataset_gauss_noise = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=gauss_noise_transforms)
     test_dataset_down_scale = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=down_scale_transforms)
     test_dataset_motion_blur = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=motion_blur_transforms)
@@ -185,7 +188,6 @@ elif DATASET == 'plant_pathology':
     test_loader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=False) 
 
     test_loader_base_line = DataLoader(dataset=test_dataset_base_line, batch_size=BATCH_SIZE, shuffle=False) 
-    test_loader_advanced_blur = DataLoader(dataset=test_dataset_advanced_blur, batch_size=BATCH_SIZE, shuffle=False) 
     test_loader_gauss_noise = DataLoader(dataset=test_dataset_gauss_noise, batch_size=BATCH_SIZE, shuffle=False)
     test_loader_down_scale = DataLoader(dataset=test_dataset_down_scale, batch_size=BATCH_SIZE, shuffle=False)
     test_loader_motion_blur = DataLoader(dataset=test_dataset_motion_blur, batch_size=BATCH_SIZE, shuffle=False)
@@ -227,7 +229,6 @@ if __name__ == "__main__":
     print(f'Time: {end-start}')
 
     test_results_baseline = trainer.test(dataloaders=test_loader_base_line)
-    test_results_advanced_blur = trainer.test(dataloaders=test_loader_advanced_blur)
     test_results_gauss_noise = trainer.test(dataloaders=test_loader_gauss_noise)
     test_results_down_scale = trainer.test(dataloaders=test_loader_down_scale)
     test_results_motion_blur = trainer.test(dataloaders=test_loader_motion_blur)
@@ -237,7 +238,6 @@ if __name__ == "__main__":
     test_results_random_sun_flare = trainer.test(dataloaders=test_loader_random_sun_flare)
     
     print(f'Baseline results: {test_results_baseline}')
-    print(f'Advanced_Blur results:  {test_results_advanced_blur}')
     print(f'Gauss_Noise:  {test_results_gauss_noise}')
     print(f'Down_Scale:  {test_results_down_scale}')
     print(f'Motion_Blur:  {test_results_motion_blur}')
