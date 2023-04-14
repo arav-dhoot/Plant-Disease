@@ -178,7 +178,7 @@ elif DATASET == 'plant_pathology':
     test_dataset_random_fog = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=random_fog_transforms)
     test_dataset_random_rain = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=random_rain_transforms)
     test_dataset_random_shadow = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=random_shadow_transforms)
-    test_dataset_random_sun_flare = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, transform=random_sun_flare_transforms)
+    test_dataset_random_sun_flare = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=random_sun_flare_transforms)
     
     train_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=True)   
     valid_loader = DataLoader(dataset=valid_dataset, batch_size=BATCH_SIZE, shuffle=False)
