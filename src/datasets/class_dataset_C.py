@@ -67,7 +67,14 @@ class PlantImageDatasetC(Dataset):
             image = image.float()
             torch.tensor(image)
         if (self.albumentation_transform):
-            image = self.albumentation_transform(image=image)['image']
+            np_image = np.array(im)
+            np_image = np_image.astype(np.uint8)
+            image = self.albumentation_transform(image=np_image)['image']
+            # image = torch.from_numpy(image)
+            image = image.permute(2, 0, 1)
+            image = image.float() 
+            torch.tensor(image)
+            # image = self.albumentation_transform(image=np.array(image))['image'].permute(2, 0, 1).float()
         if(self.random_augment): image = self.random_augment(image)   
         label = self.annotations['Label'][index]
         return image, label
