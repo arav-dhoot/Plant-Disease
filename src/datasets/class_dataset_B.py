@@ -62,7 +62,7 @@ class PlantImageDatasetB(Dataset):
         if (self.transform): 
             image = self.transform(image)
         if (self.albumentation_transform): 
-            image = self.albumentation_transform(image=image_numpy)
+            image = self.albumentation_transform(image=image_numpy)['image']
         label = self.annotations['Label'][index]
         return image, label
 

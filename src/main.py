@@ -11,6 +11,7 @@ from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
 import time
 import os
 import albumentations as A
+from albumentations.augmentations.transforms import (Downscale, GaussNoise, MotionBlur, RandomFog, RandomRain, RandomSnow, RandomSunFlare,)
 from albumentations.pytorch import ToTensorV2
 from timm.data import Mixup
 from timm.data.auto_augment import rand_augment_transform
@@ -72,13 +73,13 @@ train_transforms = T.Compose([T.Resize(size=SIZE), T.RandomRotation(45),T.Random
 resizing_transforms = T.Compose([T.Resize(size=SIZE)])
 baseline_transforms = A.Compose([ToTensorV2()])
 
-gauss_blur_transforms = iaa.Sequential([iaa.GaussianBlur(sigma=(0.0, 3.0))])
-motion_blur_transforms = iaa.Sequential([iaa.MotionBlur(k=15)])
-affine_transformers = iaa.Sequential([iaa.Affine(scale=(0.5, 1.50))])
-rain_transforms = iaa.Sequential([iaa.Rain()])
-snowflakes_transforms = iaa.Sequential([iaa.Snowflakes(flake_size=(0.1, 0.4), speed=(0.01, 0.05))])
-fog_transforms = iaa.Sequential([iaa.Fog()])
-cloud_transforms = iaa.Sequential([iaa.Clouds()])
+downscale_transform = Downscale(p=1.0, scale_min=0.2, scale_max=0.5)
+gauss_noise_transform = GaussNoise(p=1.0, var_limit=(10, 50))
+motion_blur_transform = MotionBlur(p=1.0, blur_limit=7)
+random_fog_transform = RandomFog(p=1.0, fog_coef_lower=0.3, fog_coef_upper=1.0, alpha_coef=0.08)
+random_rain_transform = RandomRain(p=1.0, brightness_coefficient=0.9, drop_width=1, drop_color=(200, 200, 200), blur_value=5)
+random_snow_transform = RandomSnow(p=1.0, brightness_coeff=2.5, snow_point_lower=0.1, snow_point_upper=0.3)
+random_sun_flare_transform = RandomSunFlare(p=1.0, flare_roi=(0, 0, 1, 0.5), angle_lower=0, angle_upper=1, num_flare_circles_lower=6, num_flare_circles_upper=10, src_radius=300)
 
 with open('../config/config.yaml', 'r') as yaml_file:
     parse_yaml = yaml.safe_load(yaml_file)
@@ -107,25 +108,27 @@ if DATASET == "new_plants":
     valid_dataset = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['valid'], csv_with_labels=parse_yaml['csv'][DATASET]['valid_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['valid'], main_dir=main_dir, transform=valid_transforms, imbalance=False)
     test_dataset = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['valid'], main_dir=main_dir, transform=valid_transforms, imbalance=False)
 
-    test_dataset_base_line = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=baseline_transforms)
-    test_dataset_gauss_blur = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=gauss_blur_transforms)
-    test_dataset_affine = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=affine_transformers)
-    test_dataset_rain = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=rain_transforms)
-    test_dataset_snowflakes = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=snowflakes_transforms)
-    test_dataset_fog = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=fog_transforms)
-    test_dataset_cloud = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=cloud_transforms)
-
+    test_dataset_base_line = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['valid'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=baseline_transforms, imbalance=False)
+    test_dataset_gauss_noise = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['valid'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=gauss_noise_transforms, imbalance=False)
+    test_dataset_down_scale = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['valid'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=down_scale_transforms, imbalance=False)
+    test_dataset_motion_blur = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['valid'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=motion_blur_transforms, imbalance=False)
+    test_dataset_random_fog = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['valid'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=random_fog_transforms, imbalance=False)
+    test_dataset_random_rain = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['valid'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=random_rain_transforms, imbalance=False)
+    test_dataset_random_shadow = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['valid'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=random_shadow_transforms, imbalance=False)
+    test_dataset_random_sun_flare = class_dataset_A.PlantImageDatasetA(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['valid'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=random_sun_flare_transforms, imbalance=False)
+    
     train_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     valid_loader = DataLoader(dataset=valid_dataset, batch_size=BATCH_SIZE, shuffle=False)
     test_loader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
-    test_loader_base_line = DataLoader(dataset=test_dataset_base_line, batch_size=BATCH_SIZE, shuffle=False)
-    test_loader_gauss_blur = DataLoader(dataset=test_dataset_gauss_blur, batch_size=BATCH_SIZE, shuffle=False)
-    test_loader_affine = DataLoader(dataset=test_dataset_affine, batch_size=BATCH_SIZE, shuffle=False)
-    test_loader_rain = DataLoader(dataset=test_dataset_rain, batch_size=BATCH_SIZE, shuffle=False)
-    test_loader_snowflakes = DataLoader(dataset=test_dataset_snowflakes, batch_size=BATCH_SIZE, shuffle=False)
-    test_loader_fog = DataLoader(dataset=test_dataset_fog, batch_size=BATCH_SIZE, shuffle=False)
-    test_loader_cloud = DataLoader(dataset=test_dataset_cloud, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_base_line = DataLoader(dataset=test_dataset_base_line, batch_size=BATCH_SIZE, shuffle=False)  
+    test_loader_gauss_noise = DataLoader(dataset=test_dataset_gauss_noise, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_down_scale = DataLoader(dataset=test_dataset_down_scale, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_motion_blur = DataLoader(dataset=test_dataset_motion_blur, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_random_fog = DataLoader(dataset=test_dataset_random_fog, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_random_rain = DataLoader(dataset=test_dataset_random_rain, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_random_shadow = DataLoader(dataset=test_dataset_random_shadow, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_random_sun_flare = DataLoader(dataset=test_dataset_random_sun_flare, batch_size=BATCH_SIZE, shuffle=False)
     
 elif DATASET == 'plant_disease':
 
@@ -135,25 +138,27 @@ elif DATASET == 'plant_disease':
     valid_dataset = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['valid'], csv_with_labels=parse_yaml['csv'][DATASET]['valid_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['valid'], main_dir=main_dir, transform=valid_transforms, imbalance=False)
     test_dataset = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['test'], main_dir=main_dir, transform=valid_transforms, imbalance=False)
     
-    test_dataset_base_line = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=baseline_transforms)
-    test_dataset_gauss_blur = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=gauss_blur_transforms)
-    test_dataset_affine = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=affine_transformers)
-    test_dataset_rain = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=rain_transforms)
-    test_dataset_snowflakes = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=snowflakes_transforms)
-    test_dataset_fog = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=fog_transforms)
-    test_dataset_cloud = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=cloud_transforms)
+    test_dataset_base_line = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['test'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=baseline_transforms, imbalance=False)
+    test_dataset_gauss_noise = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['test'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=gauss_noise_transforms, imbalance=False)
+    test_dataset_down_scale = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['test'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=down_scale_transforms, imbalance=False)
+    test_dataset_motion_blur = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['test'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=motion_blur_transforms, imbalance=False)
+    test_dataset_random_fog = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['test'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=random_fog_transforms, imbalance=False)
+    test_dataset_random_rain = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['test'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=random_rain_transforms, imbalance=False)
+    test_dataset_random_shadow = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['test'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=random_shadow_transforms, imbalance=False)
+    test_dataset_random_sun_flare = class_dataset_B.PlantImageDatasetB(csv_file=parse_yaml['csv'][DATASET]['test'], csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], root_dir=parse_yaml['root_dir'][DATASET]['test'], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=random_sun_flare_transforms, imbalance=False)
     
     train_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     valid_loader = DataLoader(dataset=valid_dataset, batch_size=BATCH_SIZE, shuffle=False)
     test_loader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
-    test_loader_base_line = DataLoader(dataset=test_dataset_base_line, batch_size=BATCH_SIZE, shuffle=False)
-    test_loader_gauss_blur = DataLoader(dataset=test_dataset_gauss_blur, batch_size=BATCH_SIZE, shuffle=False)
-    test_loader_affine = DataLoader(dataset=test_dataset_affine, batch_size=BATCH_SIZE, shuffle=False)
-    test_loader_rain = DataLoader(dataset=test_dataset_rain, batch_size=BATCH_SIZE, shuffle=False)
-    test_loader_snowflakes = DataLoader(dataset=test_dataset_snowflakes, batch_size=BATCH_SIZE, shuffle=False)
-    test_loader_fog = DataLoader(dataset=test_dataset_fog, batch_size=BATCH_SIZE, shuffle=False)
-    test_loader_cloud = DataLoader(dataset=test_dataset_cloud, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_base_line = DataLoader(dataset=test_dataset_base_line, batch_size=BATCH_SIZE, shuffle=False) 
+    test_loader_gauss_noise = DataLoader(dataset=test_dataset_gauss_noise, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_down_scale = DataLoader(dataset=test_dataset_down_scale, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_motion_blur = DataLoader(dataset=test_dataset_motion_blur, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_random_fog = DataLoader(dataset=test_dataset_random_fog, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_random_rain = DataLoader(dataset=test_dataset_random_rain, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_random_shadow = DataLoader(dataset=test_dataset_random_shadow, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_random_sun_flare = DataLoader(dataset=test_dataset_random_sun_flare, batch_size=BATCH_SIZE, shuffle=False)
 
 elif DATASET == 'plant_pathology':
 
@@ -164,28 +169,26 @@ elif DATASET == 'plant_pathology':
     test_dataset = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=valid_transforms)
 
     test_dataset_base_line = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=baseline_transforms)
-    test_dataset_gauss_blur = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=gauss_blur_transforms)
-    test_dataset_affine = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=affine_transformers)
-    test_dataset_rain = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=rain_transforms)
-    test_dataset_snowflakes = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=snowflakes_transforms)
-    test_dataset_fog = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=fog_transforms)
-    test_dataset_cloud = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=cloud_transforms)
+    test_dataset_gauss_noise = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=gauss_noise_transforms)
+    test_dataset_down_scale = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=down_scale_transforms)
+    test_dataset_motion_blur = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=motion_blur_transforms)
+    test_dataset_random_fog = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=random_fog_transforms)
+    test_dataset_random_rain = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=random_rain_transforms)
+    test_dataset_random_shadow = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=random_shadow_transforms)
+    test_dataset_random_sun_flare = class_dataset_C.PlantImageDatasetC(csv_file=parse_yaml['csv'][DATASET]['test'], root_dir=parse_yaml['root_dir'][DATASET], main_dir=main_dir, transform=resizing_transforms, albumentation_transform=random_sun_flare_transforms)
     
     train_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=True)   
     valid_loader = DataLoader(dataset=valid_dataset, batch_size=BATCH_SIZE, shuffle=False)
     test_loader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=False) 
 
     test_loader_base_line = DataLoader(dataset=test_dataset_base_line, batch_size=BATCH_SIZE, shuffle=False) 
-    test_loader_gauss_blur = DataLoader(dataset=test_dataset_gauss_blur, batch_size=BATCH_SIZE, shuffle=False)
-    test_loader_affine = DataLoader(dataset=test_dataset_affine, batch_size=BATCH_SIZE, shuffle=False)
-    test_loader_rain = DataLoader(dataset=test_dataset_rain, batch_size=BATCH_SIZE, shuffle=False)
-    test_loader_snowflakes = DataLoader(dataset=test_dataset_snowflakes, batch_size=BATCH_SIZE, shuffle=False)
-    test_loader_fog = DataLoader(dataset=test_dataset_fog, batch_size=BATCH_SIZE, shuffle=False)
-    test_loader_cloud = DataLoader(dataset=test_dataset_cloud, batch_size=BATCH_SIZE, shuffle=False)
-
-    for iter, sample in enumerate(test_loader_base_line):
-        print(sample[0].shape)
-        break
+    test_loader_gauss_noise = DataLoader(dataset=test_dataset_gauss_noise, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_down_scale = DataLoader(dataset=test_dataset_down_scale, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_motion_blur = DataLoader(dataset=test_dataset_motion_blur, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_random_fog = DataLoader(dataset=test_dataset_random_fog, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_random_rain = DataLoader(dataset=test_dataset_random_rain, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_random_shadow = DataLoader(dataset=test_dataset_random_shadow, batch_size=BATCH_SIZE, shuffle=False)
+    test_loader_random_sun_flare = DataLoader(dataset=test_dataset_random_sun_flare, batch_size=BATCH_SIZE, shuffle=False)
 
 if __name__ == "__main__":
     start = time.time()
