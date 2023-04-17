@@ -84,7 +84,7 @@ class LitModel(LightningModule):
         x, y = batch
         x = x.to(torch.int64)
         import pdb; pdb.set_trace()
-        representations = self.feature_extractor(x)
+        representations = self.feature_extractor(x.float())
         logits = self.classifier(representations)
         probabilities = torch.softmax(logits, dim=1)
         y = torch.Tensor(y)
