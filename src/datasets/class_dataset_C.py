@@ -53,38 +53,12 @@ class PlantImageDatasetC(Dataset):
     
     def __getitem__(self, index):
         img_path = os.path.join(self.root_dir, self.annotations['Image'][index])
-        im = Image.open(img_path)
-        image = T.functional.to_tensor(im)
-        if(self.transform):
-            if(type(self.transform) == T.transforms.Compose):
-                image = self.transform(image)
-            elif(type(self.transform) == A.core.composition.Compose):
-                np_image = np.array(im)
-                np_image = np_image.astype(np.uint8)
-                image = self.transform(image=np_image)['image']
-                image = torch.from_numpy(image)
-                image = image.permute(2, 0, 1)  
-            image = image.float()
-            torch.tensor(image)
-        if (self.albumentation_transform):
-            # np_image = np.array(im)
-            # np_image = np_image.astype(np.uint8)
-            # image = self.albumentation_transform(image=np_image)['image']
-            # # image = torch.from_numpy(image)
-            # image = image.permute(2, 0, 1)
-            # image = image.float() 
-            # torch.tensor(image)
-
-            np_image = np.array(im)
-            np_image = np_image.astype(np.uint8)
-            image = A.RandomRain(image=np_image)
-            print(image)
-            print(image.shape)
-            image = torch.from_numpy(image)
-            image = image.permute(2, 0, 1)
-            image = image.float() 
-            image = image.to(torch.float32)
-            # image = self.albumentation_transform(image=np.array(image))['image'].permute(2, 0, 1).float()
-        if(self.random_augment): image = self.random_augment(image)   
+        image = Image.open(img_path)
+        image_numpy = np.array(image)
+        if (self.transform): 
+            image = self.transform(T.function.to_tensor(image))
+        if (self.albumentation_transform): 
+            image = self.albumentation_transform(image=image_numpy)
+            image = torch.from_numpy(image['image'])
         label = self.annotations['Label'][index]
         return image, label

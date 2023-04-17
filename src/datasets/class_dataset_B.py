@@ -56,13 +56,13 @@ class PlantImageDatasetB(Dataset):
     
     def __getitem__(self, index):
         img_path = os.path.join(self.root_dir, f"{self.annotations_with_labels['Label'][index]}/{self.annotations_with_labels['Image'][index]}")
-        im = Image.open(img_path)
-        image = T.functional.to_tensor(im)
-        image_numpy = image.numpy()
+        image = Image.open(img_path)
+        image_numpy = np.array(image)
         if (self.transform): 
-            image = self.transform(image)
+            image = self.transform(T.function.to_tensor(image))
         if (self.albumentation_transform): 
-            image = self.albumentation_transform(image=image_numpy)['image']
+            image = self.albumentation_transform(image=image_numpy)
+            image = torch.from_numpy(image['image'])
         label = self.annotations['Label'][index]
         return image, label
 
