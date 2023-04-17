@@ -58,7 +58,6 @@ class PlantImageDatasetC(Dataset):
         if (self.transform): 
             image = self.transform(T.functional.to_tensor(image))
         if (self.albumentation_transform): 
-            import pdb; pdb.set_trace()
             image = self.albumentation_transform(image=image_numpy)
             image = image['image']
         label = self.annotations['Label'][index]

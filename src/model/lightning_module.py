@@ -82,6 +82,8 @@ class LitModel(LightningModule):
 
     def test_step(self, batch, batch_idx):
         x, y = batch
+        x = x.to(torch.int64)
+        import pdb; pdb.set_trace()
         representations = self.feature_extractor(x)
         logits = self.classifier(representations)
         probabilities = torch.softmax(logits, dim=1)
