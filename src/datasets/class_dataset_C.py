@@ -14,7 +14,7 @@ class PlantImageDatasetC(Dataset):
                  csv_file, 
                  root_dir, 
                  main_dir, 
-                 transform=None, 
+                 transform=False, 
                  albumentation_transform=None, 
                  random_augment=None, 
                  imbalance=False):
@@ -56,9 +56,10 @@ class PlantImageDatasetC(Dataset):
         image = Image.open(img_path)
         image_numpy = np.array(image)
         if (self.transform): 
-            image = self.transform(T.function.to_tensor(image))
+            image = self.transform(T.functional.to_tensor(image))
         if (self.albumentation_transform): 
+            import pdb; pdb.set_trace()
             image = self.albumentation_transform(image=image_numpy)
-            image = torch.from_numpy(image['image'])
+            image = image['image']
         label = self.annotations['Label'][index]
         return image, label

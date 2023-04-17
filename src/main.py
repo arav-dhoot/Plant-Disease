@@ -68,7 +68,7 @@ MIXUP_ALPHA = 0.5
 CUTMIX = 1
 
 valid_transforms = T.Compose([T.Resize(size=SIZE)])
-train_transforms = T.Compose([T.Resize(size=SIZE), T.RandomRotation(45),T.RandomHorizontalFlip(), T.RandomVerticalFlip(), T.RandomAffine(0, translate=(0.1, 0.1), shear=0.1), T.Normalize(mean=[0.267, 0.267, 0.267], std=[0.247, 0.247, = T.Compose([T.Resize(size=SIZE)])
+train_transforms = T.Compose([T.Resize(size=SIZE), T.RandomRotation(45),T.RandomHorizontalFlip(), T.RandomVerticalFlip(), T.RandomAffine(0, translate=(0.1, 0.1), shear=0.1), T.Normalize(mean=[0.267, 0.267, 0.267], std=[0.247, 0.247, 0.247])])
 baseline_transforms = A.Compose([ToTensorV2()])
 
 down_scale_transforms = Downscale(p=1.0, scale_min=0.2, scale_max=0.5)
