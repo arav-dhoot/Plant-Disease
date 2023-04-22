@@ -1,16 +1,15 @@
-import pytorch_lightning as pl
-import torchmetrics
-import torch.optim
-import torch.nn as nn
-import torch.nn.functional as F
 import timm
+import numpy as np
+import torch.optim
+import torchmetrics
+import torch.nn as nn
+import pytorch_lightning as pl
+import torch.nn.functional as F
 from timm.data import resolve_data_config
-from timm.data.transforms_factory import create_transform
-from torch import nn
 from timm.loss import SoftTargetCrossEntropy
 from pytorch_lightning.core.module import LightningModule
+from timm.data.transforms_factory import create_transform
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
-import numpy as np
 
 class LitModel(LightningModule):
     def __init__(self, 
