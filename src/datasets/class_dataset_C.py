@@ -4,7 +4,6 @@ import pandas as pd
 from PIL import Image
 import torchvision.transforms as T
 from torch.utils.data import Dataset
-from torchvision.io import read_image
 
 class PlantImageDatasetC(Dataset):
     def __init__(self, 
