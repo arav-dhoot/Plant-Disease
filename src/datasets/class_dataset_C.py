@@ -60,5 +60,9 @@ class PlantImageDatasetC(Dataset):
         if (self.albumentation_transform): 
             image = self.albumentation_transform(image=image_numpy)
             image = image['image']
+        if (self.random_augment):
+            transform = T.Compose([T.Resize(size = (224, 224)), T.PILToTensor()])
+            image = self.random_augment(image)
+            image = transform(image)
         label = self.annotations['Label'][index]
         return image, label
