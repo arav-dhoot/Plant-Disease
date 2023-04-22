@@ -14,7 +14,8 @@ class PlantImageDatasetB(Dataset):
                  csv_with_labels, 
                  root_dir, 
                  main_dir, 
-                 transform=None, 
+                 transform=None,
+                 random_augment=None, 
                  imbalance=False):
         
         self.root_dir = root_dir
@@ -24,6 +25,7 @@ class PlantImageDatasetB(Dataset):
         self.annotations = pd.read_csv(os.path.join(self.main_dir, self.csv_file))
         self.annotations_with_labels = pd.read_csv(os.path.join(self.main_dir, self.csv_with_labels))
         self.transform = transform
+        self.random_augment = random_augment
         self.imbalance = imbalance
 
         if self.imbalance:
