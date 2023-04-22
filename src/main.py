@@ -3,13 +3,11 @@ import time
 import yaml
 import torch
 import argparse
-import albumentations as A
 from timm.data import Mixup
 import pytorch_lightning as pl
 import torchvision.transforms as T
 from torch.utils.data import DataLoader
 from model.lightning_module import LitModel
-from albumentations.pytorch import ToTensorV2
 from timm.data.auto_augment import rand_augment_transform
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping 
 from datasets import class_dataset_A, class_dataset_B, class_dataset_C
