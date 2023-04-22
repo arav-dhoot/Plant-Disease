@@ -1,13 +1,12 @@
 import os
+import torch
+import numpy as np
 import pandas as pd
-from torch.functional import _return_counts
+from PIL import Image
+import albumentations as A
+import torchvision.transforms as T
 from torch.utils.data import Dataset
 from torchvision.io import read_image
-import torchvision.transforms as T
-import numpy as np
-from PIL import Image
-import torch
-import random
 
 class PlantImageDatasetB(Dataset):
     def __init__(self, 
@@ -16,7 +15,6 @@ class PlantImageDatasetB(Dataset):
                  root_dir, 
                  main_dir, 
                  transform=None, 
-                 albumentation_transform=None, 
                  imbalance=False):
         
         self.root_dir = root_dir
@@ -26,7 +24,6 @@ class PlantImageDatasetB(Dataset):
         self.annotations = pd.read_csv(os.path.join(self.main_dir, self.csv_file))
         self.annotations_with_labels = pd.read_csv(os.path.join(self.main_dir, self.csv_with_labels))
         self.transform = transform
-        self.albumentation_transform = albumentation_transform
         self.imbalance = imbalance
 
         if self.imbalance:
@@ -60,9 +57,10 @@ class PlantImageDatasetB(Dataset):
         image_numpy = np.array(image)
         if (self.transform): 
             image = self.transform(T.function.to_tensor(image))
-        if (self.albumentation_transform): 
-            image = self.albumentation_transform(image=image_numpy)
-            image = torch.from_numpy(image['image'])
+        if (self.random_augment):
+            transform = T.Compose([T.Resize(size = (224, 224)), T.PILToTensor()])
+            image = self.random_augment(image)
+            image = transform(image)
         label = self.annotations['Label'][index]
         return image, label
 
