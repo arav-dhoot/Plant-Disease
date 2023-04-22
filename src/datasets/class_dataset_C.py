@@ -1,13 +1,12 @@
 import os
-import pandas as pd
 import torch
+import numpy as np
+import pandas as pd
+from PIL import Image
+import albumentations as A
+import torchvision.transforms as T
 from torch.utils.data import Dataset
 from torchvision.io import read_image
-from PIL import Image
-import torchvision.transforms as T
-import numpy as np
-import albumentations as A
-import cv2
 
 class PlantImageDatasetC(Dataset):
     def __init__(self, 
@@ -24,7 +23,6 @@ class PlantImageDatasetC(Dataset):
         self.csv_file = csv_file
         self.annotations = pd.read_csv(os.path.join(self.main_dir, self.csv_file))
         self.transform = transform
-        self.albumentation_transform = albumentation_transform
         self.imbalance = imbalance
         self.random_augment = random_augment
 
@@ -57,9 +55,6 @@ class PlantImageDatasetC(Dataset):
         image_numpy = np.array(image)
         if (self.transform): 
             image = self.transform(T.functional.to_tensor(image))
-        if (self.albumentation_transform): 
-            image = self.albumentation_transform(image=image_numpy)
-            image = image['image']
         if (self.random_augment):
             transform = T.Compose([T.Resize(size = (224, 224)), T.PILToTensor()])
             image = self.random_augment(image)
