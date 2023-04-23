@@ -131,7 +131,7 @@ elif DATASET == 'plant_disease':
 
     train_dataset = class_dataset_B.PlantImageDatasetB(
                                                        csv_file=parse_yaml['csv'][DATASET]['train'], 
-                                                       csv_with_labels=parse_yaml['csv'][DATASET]['train_with_labels'], r
+                                                       csv_with_labels=parse_yaml['csv'][DATASET]['train_with_labels'], 
                                                        oot_dir=parse_yaml['root_dir'][DATASET]['train'], 
                                                        main_dir=main_dir, 
                                                        transform=train_transforms, 
