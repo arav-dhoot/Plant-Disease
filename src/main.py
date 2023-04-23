@@ -2,6 +2,8 @@ import os
 import time
 import yaml
 import torch
+import wandb
+import random
 import argparse
 from timm.data import Mixup
 import pytorch_lightning as pl
@@ -205,11 +207,30 @@ if __name__ == "__main__":
                          dirpath = model_dirpath, 
                          filename = model_filename,
                          every_n_epochs=1)
+    
+    id = random.randint(0, 100)
+    config = {
+         'batch_size': BATCH_SIZE,
+         'epochs': EPOCHS,
+         'model': MODEL,
+         'learning_rate': LEARNING_RATE,
+         'weight_decay': WEIGHT_DECAY, 
+    }
+
+    wandb.init(
+         project=f'{DATASET}-{id}',
+         id='id',
+         path= '/wandb_files',
+         job_type='testing',
+         config=config,
+    )
 
     device = torch.device('cuda')
     model = LitModel(NUM_CLASSES, MODEL, LEARNING_RATE, WEIGHT_DECAY, FINE_TUNE, MIXUP).to(device)
     trainer = pl.Trainer(max_epochs=EPOCHS, accelerator="cuda", callbacks=[early_stop_callback, mc])
     trainer.fit(model, train_loader, valid_loader)
+
+    wandb.log(trainer.callback_metrics())
 
     end = time.time()
     print(f'Time: {end-start}')
