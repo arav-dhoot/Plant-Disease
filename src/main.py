@@ -217,7 +217,7 @@ if __name__ == "__main__":
          'weight_decay': WEIGHT_DECAY, 
     }
 
-    wandb.init(
+    run = wandb.init(
          project=f'{DATASET}',
          id='id',
          job_type='testing',
@@ -229,7 +229,7 @@ if __name__ == "__main__":
     trainer = pl.Trainer(max_epochs=EPOCHS, accelerator="cuda", callbacks=[early_stop_callback, mc])
     trainer.fit(model, train_loader, valid_loader)
 
-    wandb.log(trainer.callback_metrics())
+    run.log(trainer.callback_metrics())
 
     end = time.time()
     print(f'Time: {end-start}')
