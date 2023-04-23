@@ -218,9 +218,8 @@ if __name__ == "__main__":
     }
 
     wandb.init(
-         project=f'{DATASET}-{id}',
+         project=f'{DATASET}',
          id='id',
-         path= '/wandb_files',
          job_type='testing',
          config=config,
     )
