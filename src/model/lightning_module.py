@@ -1,4 +1,5 @@
 import timm
+import wandb
 import torch.optim
 import torchmetrics
 import torch.nn as nn
@@ -22,14 +23,16 @@ class LitModel(LightningModule):
         self.weight_decay = weight_decay
         self.learning_rate = learning_rate
         self.mixup_func = mixup_func
+        self.dropout = dropout_rate
         self.accuracy = torchmetrics.classification.MulticlassAccuracy(self.num_classes)
         self.model = model
+        self.criterion = SoftTargetCrossEntropy() if (self.mixup_func is not None) else nn.CrossEntropyLoss()
+
         if model == 'ViT':
             self.feature_extractor = timm.create_model('vit_base_patch16_224_in21k', pretrained=True, num_classes=0)
             config = resolve_data_config({}, model=self.feature_extractor)
             transform = create_transform(**config)
             self.classifier = nn.Linear(768, self.num_classes)
-
         elif model == 'ResNet':
             self.feature_extractor = timm.create_model('resnet50', pretrained=True, num_classes=0)
             config = resolve_data_config({}, model=self.feature_extractor)
@@ -39,11 +42,19 @@ class LitModel(LightningModule):
         if (not fine_tune):
             for param in self.feature_extractor.parameters():
                 param.requires_grad = False
-
-        if (self.mixup_func is not None):
-            self.criterion = SoftTargetCrossEntropy()
-        else:
-            self.criterion = nn.CrossEntropyLoss()
+        
+        config = {
+            'model': self.model,
+            'learning_rate': self.learning_rate,
+            'weight_decay': self.weight_decay,
+            'droupout': self.dropout
+        }
+        
+        self.wandb_run = wandb.init(
+            project='plant_pathology',
+            id = f'{self.num_classes}',
+            config=config
+        )
 
     def training_step(self, batch, batch_idx):
         x, y = batch    
@@ -60,6 +71,7 @@ class LitModel(LightningModule):
             self.log("accuracy", acc, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         else:
             self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        self.wandb_run.log({'training loss': loss})
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -87,6 +99,8 @@ class LitModel(LightningModule):
         acc = self.accuracy(probabilities, y)
         self.log("accuracy", acc, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         self.log("test_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        self.wandb_run.log({'test loss': loss})
+        self.wandb_run.log({'accuracy': acc})
         return loss
 
     def forward(self, x):
