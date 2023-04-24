@@ -51,8 +51,8 @@ class LitModel(LightningModule):
         }
         
         self.wandb_run = wandb.init(
-            project='plant_pathology',
-            id = f'{self.num_classes}',
+            project='Plant_Disease',
+            id = f'{self.num_classes}-{self.model}-{self.weight_decay}',
             config=config
         )
 

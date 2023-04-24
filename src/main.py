@@ -210,7 +210,6 @@ if __name__ == "__main__":
     
     id = random.randint(0, 100)
     config = {
-         'batch_size': BATCH_SIZE,
          'epochs': EPOCHS,
          'model': MODEL,
          'learning_rate': LEARNING_RATE,
@@ -218,9 +217,8 @@ if __name__ == "__main__":
     }
 
     run = wandb.init(
-         project=f'{DATASET}',
-         id='id',
-         job_type='testing',
+         project='Plant_Disease',
+         id=f'{NUM_CLASSES}-{MODEL}-{WEIGHT_DECAY}',
          config=config,
     )
 
