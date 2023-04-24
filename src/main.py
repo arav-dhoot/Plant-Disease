@@ -229,9 +229,8 @@ if __name__ == "__main__":
     trainer = pl.Trainer(max_epochs=EPOCHS, accelerator="cuda", callbacks=[early_stop_callback, mc])
     trainer.fit(model, train_loader, valid_loader)
 
-    run.log(trainer.callback_metrics())
-
     end = time.time()
     print(f'Time: {end-start}')
 
     test_results = trainer.test(dataloaders=test_loader)
+    run.log(trainer.callback_metrics())
