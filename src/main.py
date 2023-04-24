@@ -117,7 +117,7 @@ if DATASET == "new_plants":
                                                       csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], 
                                                       root_dir=parse_yaml['root_dir'][DATASET]['valid'], 
                                                       main_dir=main_dir, 
-                                                      random_augment=rand_augment_transform, 
+                                                      random_augment=random_augment_transform, 
                                                       imbalance=False
                                                       )
 
@@ -150,7 +150,7 @@ elif DATASET == 'plant_disease':
                                                       csv_with_labels=parse_yaml['csv'][DATASET]['test_with_labels'], 
                                                       root_dir=parse_yaml['root_dir'][DATASET]['test'], 
                                                       main_dir=main_dir, 
-                                                      random_augment=rand_augment_transform, 
+                                                      random_augment=random_augment_transform, 
                                                       imbalance=False
                                                       )
     
@@ -180,7 +180,7 @@ elif DATASET == 'plant_pathology':
                                                       csv_file=parse_yaml['csv'][DATASET]['test'], 
                                                       root_dir=parse_yaml['root_dir'][DATASET], 
                                                       main_dir=main_dir, 
-                                                      random_augment=rand_augment_transform, 
+                                                      random_augment=random_augment_transform, 
                                                       imbalance=False
                                                       )
 
