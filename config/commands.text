@@ -1,3 +1,3 @@
 git config --global user.name "Arav Dhoot"
 git config --global user.email "aravdhoot@gmail.com"
-pip install pytorch-lightning timm torchvision albumentations
+pip install pytorch-lightning timm torchvision albumentations wandb
