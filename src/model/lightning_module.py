@@ -85,6 +85,8 @@ class LitModel(LightningModule):
         acc = self.accuracy(probabilities, y)
         self.log("accuracy", acc, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         self.log("valid_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        self.wandb_run.log({'valid loss': loss})
+        self.wandb_run.log({'valid accuracy': acc})
         return loss
 
     def test_step(self, batch, batch_idx):
