@@ -218,7 +218,7 @@ if __name__ == "__main__":
 
     run = wandb.init(
          project='Plant_Disease',
-         id=f'{NUM_CLASSES}-{MODEL}-{WEIGHT_DECAY}-actual',
+         id=f'{DATASET}-{MODEL}-{WEIGHT_DECAY}',
          config=config,
     )
 
