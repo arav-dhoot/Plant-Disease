@@ -51,7 +51,7 @@ class LitModel(LightningModule):
         }
         
         self.wandb_run = wandb.init(
-            project='Plant_Disease_Recognition',
+            project='Plant_Disease',
             id = f'{self.num_classes}-{self.model}-{self.weight_decay}-module',
             config=config
         )
@@ -71,7 +71,6 @@ class LitModel(LightningModule):
             self.log("accuracy", acc, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         else:
             self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
-        self.wandb_run.log({'training loss': loss})
         return loss
 
     def validation_step(self, batch, batch_idx):
