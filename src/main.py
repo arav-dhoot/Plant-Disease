@@ -68,7 +68,7 @@ train_transforms = T.Compose([
     T.Normalize(mean=[0.267, 0.267, 0.267], std=[0.247, 0.247, 0.247])]
 )
 
-random_augment_transform = random_transform = rand_augment_transform(
+random_augment_transform = rand_augment_transform(
     config_str='rand-m9-mstd0.5', 
     hparams={'translate_const': 117, 'img_mean': (124, 116, 104)}
 )
