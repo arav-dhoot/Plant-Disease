@@ -1,3 +1,14 @@
 git config --global user.name "Arav Dhoot"
 git config --global user.email "aravdhoot@gmail.com"
 pip install pytorch-lightning timm torchvision albumentations wandb
+
+
+# Baseline testing
+python main.py --dataset plant_pathology --model ResNet --epochs 30
+python main.py --dataset plant_pathology --model ViT --epochs 40
+
+python main.py --dataset plant_disease --model ResNet --epochs 30
+python main.py --dataset plant_disease --model ViT --epochs 40
+
+python main.py --dataset new_plants --model ResNet --epochs 30
+python main.py --dataset new_plants --model ViT --epochs 40
