@@ -109,7 +109,7 @@ if DATASET == "new_plants":
                                                        csv_with_labels=parse_yaml['csv'][DATASET]['valid_with_labels'], 
                                                        root_dir=parse_yaml['root_dir'][DATASET]['valid'], 
                                                        main_dir=main_dir, 
-                                                       transform=valid_transforms, 
+                                                       random_augment=random_augment_transform, 
                                                        imbalance=False
                                                        )
     test_dataset = class_dataset_A.PlantImageDatasetA(
@@ -142,7 +142,7 @@ elif DATASET == 'plant_disease':
                                                        csv_with_labels=parse_yaml['csv'][DATASET]['valid_with_labels'], 
                                                        root_dir=parse_yaml['root_dir'][DATASET]['valid'], 
                                                        main_dir=main_dir, 
-                                                       transform=valid_transforms, 
+                                                       random_augment=random_augment_transform, 
                                                        imbalance=False
                                                        )
     test_dataset = class_dataset_B.PlantImageDatasetB(
@@ -173,7 +173,7 @@ elif DATASET == 'plant_pathology':
                                                        csv_file=parse_yaml['csv'][DATASET]['valid'], 
                                                        root_dir=parse_yaml['root_dir'][DATASET], 
                                                        main_dir=main_dir, 
-                                                       transform=valid_transforms, 
+                                                       random_augment=random_augment_transform, 
                                                        imbalance=False
                                                        )
     test_dataset = class_dataset_C.PlantImageDatasetC(
@@ -218,7 +218,7 @@ if __name__ == "__main__":
 
     run = wandb.init(
          project='Plant_Disease',
-         id=f'{DATASET}-{MODEL}-{WEIGHT_DECAY}',
+         id=f'{DATASET}-{MODEL}-{WEIGHT_DECAY}-{random.randint(10000, 1000000)}',
          config=config,
     )
 

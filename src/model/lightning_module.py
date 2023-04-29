@@ -75,12 +75,12 @@ class LitModel(LightningModule):
 
     def validation_step(self, batch, batch_idx):
         x, y = batch
-        representations = self.feature_extractor(x)
+        x = x.to(torch.int64)
+        representations = self.feature_extractor(x.float())
         logits = self.classifier(representations)
         probabilities = torch.softmax(logits, dim=1)
         y = torch.Tensor(y)
         loss = self.criterion(probabilities, y)
-        # accuracy = torchmetrics.functional.accuracy(probabilities, y, task='multiclass')
         acc = self.accuracy(probabilities, y)
         self.log("accuracy", acc, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         self.log("valid_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
