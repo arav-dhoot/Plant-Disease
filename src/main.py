@@ -192,7 +192,11 @@ elif DATASET == 'plant_pathology':
 if __name__ == "__main__":
     start = time.time()
 
-    early_stop_callback = EarlyStopping(monitor="valid_loss", min_delta=0.00, patience=5, verbose=False, mode="min")
+    early_stop_callback = EarlyStopping(monitor="accuracy", 
+                                        min_delta=0.00, 
+                                        patience=5, 
+                                        verbose=False, 
+                                        mode="max")
     
     model_dirpath = os.path.join('saved_models', DATASET, MODEL)
     if FINE_TUNE:
