@@ -28,8 +28,6 @@ class PlantImageDatasetB(Dataset):
         if self.imbalance:
             self.annotations = self.create_imbalance(self.annotations)
 
-        print(self.annotations['Label'].value_counts())
-
     def create_imbalance(self, dataframe):
         unique_classes = pd.unique(dataframe['Label'])
         k = round(0.5*len(unique_classes))
@@ -55,7 +53,7 @@ class PlantImageDatasetB(Dataset):
         image = Image.open(img_path)
         image_numpy = np.array(image)
         if (self.transform): 
-            image = self.transform(T.function.to_tensor(image))
+            image = self.transform(T.functional.to_tensor(image))
         if (self.random_augment):
             transform = T.Compose([T.Resize(size = (224, 224)), T.PILToTensor()])
             image = self.random_augment(image)
