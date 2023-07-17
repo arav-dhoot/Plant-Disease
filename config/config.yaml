@@ -1,17 +1,17 @@
 main_dir:
-  new_plants: '/root/Plant-Disease/data/New Plants Diseases Dataset'
-  plant_disease: '/root/Plant-Disease/data/Plant Disease Recognition'
-  plant_pathology: '/root/Plant-Disease/data/plant-pathology-2020-fgvc7'
+  new_plants: '/Plant-Disease/data/New Plants Diseases Dataset'
+  plant_disease: '/Plant-Disease/data/Plant Disease Recognition'
+  plant_pathology: '/Plant-Disease/data/plant-pathology-2020-fgvc7'
 
 root_dir:
   new_plants:
-    train: '/root/Plant-Disease/data/New Plants Diseases Dataset/New Plant Diseases Dataset(Augmented)/New Plant Diseases Dataset(Augmented)/train'
-    valid: '/root/Plant-Disease/data/New Plants Diseases Dataset/New Plant Diseases Dataset(Augmented)/New Plant Diseases Dataset(Augmented)/valid'
+    train: '/Plant-Disease/data/New Plants Diseases Dataset/New Plant Diseases Dataset(Augmented)/New Plant Diseases Dataset(Augmented)/train'
+    valid: '/Plant-Disease/data/New Plants Diseases Dataset/New Plant Diseases Dataset(Augmented)/New Plant Diseases Dataset(Augmented)/valid'
   plant_disease:
-    train: '/root/Plant-Disease/data/Plant Disease Recognition/Train/Train'
-    valid: '/root/Plant-Disease/data/Plant Disease Recognition/Validation/Validation'
-    test: '/root/Plant-Disease/data/Plant Disease Recognition/Test/Test'
-  plant_pathology: '/root/Plant-Disease/data/plant-pathology-2020-fgvc7/Train'
+    train: '/Plant-Disease/data/Plant Disease Recognition/Train/Train'
+    valid: '/Plant-Disease/data/Plant Disease Recognition/Validation/Validation'
+    test: '/Plant-Disease/data/Plant Disease Recognition/Test/Test'
+  plant_pathology: '/Plant-Disease/data/plant-pathology-2020-fgvc7/Train'
   
 csv:
   new_plants: 
